@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Live Logs</title>
+		<meta charset="UTF-8">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<style>
+		div#results>div:nth-child(odd){	background-color: antiquewhite;
+		} 
+		div#results>div:nth-child(even){	background-color: lightpink;
+		} 
+		.myip {
+			color: white;
+			background-color: green;
+		}
+		.myip6 {
+			color: white;
+			background-color: purple;
+		}
+		mark{
+			background: darkblue;
+			color: white;
+		}	
+		</style>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.js" integrity="sha512-19TrqSGVSwaC2IDGHrD+tAkX59/w5cXy0BHDVwn7OJQXxavORhFSFM7DOO9soXKuo8O7gGNHiG9R2vFrXRBcTQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		<script>
+			function liveSearch(value){
+				value = value.trim(); // remove any spaces around the text
+				isCheck = $("input[name='popular']").is(":checked")
+				
+				
+				if(value != ""){ // don't make requests with an empty string
+					$.ajax({
+						url: "search",
+						data: {searchText: value, isCheck: isCheck},
+						dataType: "json",
+						beforeSend: function(){
+							$("#loading").show();
+							$("#result").hide();
+						},
+						complete: function(){
+							$("#loading").hide();
+							$("#result").show();
+						},
+						success: function(data){
+							var res = "";
+						
+							// create the html with results
+							for(i in data.results){	
+							//	console.log("console.log(data.ip_list6[i]) = " + data.ip_list6[i])
+							//	console.log("console.log(data.ip_list[i]) = " + data.ip_list[i])
+							//	console.log((data.ip_list6[i] == null) ? "true" : "false")
+								console.log("data.match[i] = " +data.match[i]);	
+								if ((data.ip_list6[i] == null))
+								{
+									res += "<div><span class='myip'>" + data.ip_list[i]+"</span>"+ data.results[i]+"</div>";
+								}
+								else {								
+									res += "<div><span class='myip6'>" + data.ip_list6[i]+"</span>"+ data.results[i]+"</div>";			
+								}						
+							//	res += "<div><span class='myip'>" + data.ip_list[i]  + "</span>" +" "+ "<span class='myip6'> " + data.ip_list6[i]+"</span>"+ data.results[i]+"</div>";
+							}
+							$("#results").html(res);
+							if(data.isCheck) {
+								console.log("maark = " + value);
+								setTimeout(function(){
+								$("#results").mark(value, options = {});
+							}, 500,500);
+							}
+							
+						}
+
+					});
+				}
+				else{
+					$("#results").html("<h2>Not found.</h2>"); // set the results empty in case of empty string
+				}
+			}
+		</script>
+		
+	</head>
+	<body>
+		<h1>Live Logs Search</h1>
+		<input type="text" onkeyup="liveSearch(this.value)"> <!-- Assigns the key up event to call the liveSearch() function -->
+		<input type="checkbox" name="popular" unchecked>Filter popular bots
+		<br>
+		<h2 id='loading'>Loading...</h2>
+		<div id="results"></div> <!-- Results will be printed here -->
+		<script>
+			text = $("#results");
+			console.log("text=" + text);
+		</script>
+	</body>
+</html>
